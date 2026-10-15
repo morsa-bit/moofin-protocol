@@ -57,9 +57,12 @@ export default function LandingPage() {
             <Link href="/admin" className="text-slate-600 hover:text-black transition">
               Mi Perfil
             </Link>
-            <button className="bg-moofin-teal hover:bg-moofin-darkTeal text-black px-4 py-2 rounded-xl transition shadow-sm font-extrabold">
+            <Link
+              href="/inscribirme"
+              className="bg-moofin-teal hover:bg-moofin-darkTeal text-black px-4 py-2 rounded-xl transition shadow-sm font-extrabold"
+            >
               Inscribirme
-            </button>
+            </Link>
           </nav>
         </div>
       </header>
