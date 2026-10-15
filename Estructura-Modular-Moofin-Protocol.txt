@@ -1,0 +1,19 @@
+src/
+├── app/
+│   ├── (auth)/                 # Rutas de login / acceso de staff y admin
+│   ├── (public)/               # Landing page, /patrocinadores, /consulta
+│   ├── admin/                  # Dashboard y módulos de gestión (/evento, /tallas, etc.)
+│   └── api/                    # Webhooks, cronjobs y endpoints de API
+├── components/
+│   ├── admin/                  # Tablas, métricas, modales de edición
+│   ├── public/                 # Hero, mapa GPX, acordeón FAQ, tabla de planes
+│   └── ui/                     # Botones, inputs, badges, cards reutilizables
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts           # Cliente para componentes cliente (Browser)
+│   │   ├── server.ts           # Cliente para Server Components y Actions
+│   │   └── admin.ts            # Cliente con service_role para operaciones atómicas
+│   ├── qr.ts                   # Generador de códigos QR con SVG/DataURL
+│   └── utils.ts                # Formateadores de moneda (USD/Bs), fechas y cálculo de edad
+└── types/
+    └── database.ts             # Tipos TypeScript generados a partir de Supabase
