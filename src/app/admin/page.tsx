@@ -76,10 +76,13 @@ export default function AdminDashboardPage() {
                 <Timer size={16} />
                 <span>Cronometraje</span>
               </button>
-              <button className="flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">
+              <Link
+                href="/admin/kits"
+                className="flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
+              >
                 <QrCode size={16} />
                 <span>Entregar kits (escanear)</span>
-              </button>
+              </Link>
             </div>
           </div>
 
