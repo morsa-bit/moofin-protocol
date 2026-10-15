@@ -68,14 +68,20 @@ export default function AdminDashboardPage() {
               En Sitio · Día del evento
             </span>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center space-x-2 bg-moofin-teal hover:bg-moofin-darkTeal text-black font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">
+              <Link
+                href="/admin/inscribir"
+                className="flex items-center space-x-2 bg-moofin-teal hover:bg-moofin-darkTeal text-black font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
+              >
                 <Users size={16} />
                 <span>Inscribir en sitio</span>
-              </button>
-              <button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">
+              </Link>
+              <Link
+                href="/admin/cronometraje"
+                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
+              >
                 <Timer size={16} />
                 <span>Cronometraje</span>
-              </button>
+              </Link>
               <Link
                 href="/admin/escanear"
                 className="flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm"
