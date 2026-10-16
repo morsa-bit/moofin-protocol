@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdminNavbar from '@/components/admin/AdminNavbar';
 import TicketModal from '@/components/admin/TicketModal';
+import { createClient } from '@/lib/supabase/client';
 import {
   ArrowLeft,
   Mail,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function CorredoresPage() {
+  const supabase = createClient();
   const [selectedRunner, setSelectedRunner] = useState<any>(null);
   const [busqueda, setBusqueda] = useState('');
   const [filtroModalidad, setFiltroModalidad] = useState('TODAS');
@@ -81,6 +83,39 @@ export default function CorredoresPage() {
       qrToken: 'moofin-token-bib-009',
     },
   ]);
+
+  useEffect(() => {
+    const cargarCorredores = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('runners')
+          .select('*, modalities(name), teams(name)')
+          .order('bib_number', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          const mapeados = data.map((r: any) => ({
+            id: r.id,
+            bib: r.bib_number,
+            name: `${r.first_name || ''} ${r.last_name || ''}`.trim(),
+            nationalId: r.national_id,
+            modality: r.modalities?.name || 'CARRERA',
+            shirtSize: r.shirt_size,
+            shirtCut: r.shirt_cut || 'DAMAS',
+            category: r.category_name || '—',
+            team: r.teams?.name || '—',
+            status: r.status === 'CONFIRMED' ? 'CONFIRMADA' : r.status,
+            type: (r.registration_type || 'comercial').toLowerCase(),
+            qrToken: r.qr_token || `moofin-token-bib-${r.bib_number || r.id}`,
+          }));
+          setCorredores(mapeados);
+        }
+      } catch (err) {
+        console.error('Error cargando corredores desde Supabase:', err);
+      }
+    };
+
+    cargarCorredores();
+  }, []);
 
   const corredoresFiltrados = corredores.filter((c) => {
     const coincideTexto =

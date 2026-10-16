@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -15,12 +15,24 @@ import {
 import TicketModal from '@/components/admin/TicketModal';
 
 export default function InscribirmePage() {
-  const bcvRate = 877.9023; // Tasa referencial activa
+  const [bcvRate, setBcvRate] = useState<number>(877.9023); // Tasa referencial activa
 
   // Estado del flujo
   const [pasoExitoso, setPasoExitoso] = useState<any>(null);
+  const [mostrarTicketModal, setMostrarTicketModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copiado, setCopiado] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/bcv')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.tasa) {
+          setBcvRate(Number(data.tasa));
+        }
+      })
+      .catch((err) => console.error('Error cargando tasa BCV:', err));
+  }, []);
 
   // 1. Datos del corredor
   const [prefijoCedula, setPrefijoCedula] = useState('V');
@@ -69,24 +81,46 @@ export default function InscribirmePage() {
     }
 
     setLoading(true);
-
     try {
-      // Simulación de envío y respuesta del servidor
-      setTimeout(() => {
-        const nuevoDorsal = Math.floor(Math.random() * 200) + 800;
-        setPasoExitoso({
-          bib: nuevoDorsal,
-          name: nombreApellido,
-          nationalId: `${prefijoCedula}-${numeroCedula}`,
-          modality: modalidad,
-          shirtSize: talla,
-          shirtCut: sexo === 'F' ? 'DAMAS' : 'CABALLEROS',
-          qrToken: `moofin-token-${nuevoDorsal}-${Date.now()}`,
-        });
-        setLoading(false);
-      }, 1500);
+      const fechaNacimientoIso = `${anoNac}-${String(mesNac).padStart(2, '0')}-${String(diaNac).padStart(2, '0')}`;
+      const res = await fetch('/api/inscripcion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          national_id: `${prefijoCedula}-${numeroCedula.trim()}`,
+          full_name: nombreApellido,
+          birth_date: fechaNacimientoIso,
+          gender: sexo,
+          phone: telefono,
+          email: correo,
+          modality_name: modalidad,
+          shirt_size: talla,
+          team_code: codigoEquipo,
+          payment_method: formaPago,
+          reference_number: referencia,
+          bank_code: bancoEmisor,
+          amount_bs: montoPagadoBs || montoExactoBs.toFixed(2),
+          courtesy_code: codigoCortesia,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'No se pudo completar el registro');
+      }
+
+      setPasoExitoso({
+        bib: data.bib,
+        name: data.name,
+        nationalId: data.nationalId,
+        modality: data.modality,
+        shirtSize: data.shirtSize,
+        shirtCut: data.shirtCut,
+        qrToken: data.qrToken,
+      });
     } catch (err: any) {
-      alert('Error en la inscripción: ' + err.message);
+      alert(err.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -164,7 +198,7 @@ export default function InscribirmePage() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => window.print()}
+                onClick={() => setMostrarTicketModal(true)}
                 className="flex-1 bg-moofin-teal hover:bg-moofin-darkTeal text-black font-extrabold text-xs py-3.5 rounded-xl transition shadow-sm flex items-center justify-center space-x-2"
               >
                 <Ticket size={16} />
@@ -177,6 +211,13 @@ export default function InscribirmePage() {
                 Volver al inicio
               </Link>
             </div>
+
+            {mostrarTicketModal && (
+              <TicketModal
+                runner={pasoExitoso}
+                onClose={() => setMostrarTicketModal(false)}
+              />
+            )}
           </div>
         ) : (
           /* Formulario Multipaso Reactivo */
