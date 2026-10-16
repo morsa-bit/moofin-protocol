@@ -32,9 +32,17 @@ export default function EditarEventoPage() {
   const fetchBcvRate = async () => {
     setFetchingBcv(true);
     try {
-      // Simulación de consulta o llamado a endpoint
-      setBcvRate(877.9023);
-      alert('Tasa oficial BCV actualizada.');
+      const res = await fetch('/api/bcv');
+      const data = await res.json();
+      if (data.success && data.tasa) {
+        setBcvRate(data.tasa);
+        alert(`Tasa BCV actualizada a ${data.tasa.toFixed(4)} Bs/USD`);
+      } else {
+        alert('No se pudo actualizar automáticamente. Puedes ingresarla manualmente.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de conexión al consultar el BCV.');
     } finally {
       setFetchingBcv(false);
     }
